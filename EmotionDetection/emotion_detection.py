@@ -17,20 +17,30 @@ def emotion_detector(text_to_analyze):
         "grpc-metadata-mm-model-id":
          "emotion_aggregated-workflow_lang_en_stock"
     }
+    #Assign varibles to None, just in case
+    anger_score = None
+    disgust_score = None
+    fear_score = None
+    joy_score = None
+    sadness_score = None
+    dominant_emotion = None
     #JSON object
     myobj = {"raw_document":{"text": text_to_analyze}}
     response = requests.post(url,json=myobj,headers=headers)
     #formatted_response is the main dictionary returned by your API call,
     # converted from JSON format into a Python dictionary.
     formatted_response = json.loads(response.text)
-    emotions_data = formatted_response['emotionPredictions'][0]['emotion']
-    anger_score = emotions_data['anger']
-    disgust_score = emotions_data['disgust']
-    fear_score = emotions_data['fear']
-    joy_score = emotions_data['joy']
-    sadness_score = emotions_data['sadness']    
-    dominant_emotion = max(emotions_data, key=emotions_data.get)
-    
+    if response.status_code == 200:
+        emotions_data = formatted_response['emotionPredictions'][0]['emotion']
+        anger_score = emotions_data['anger']
+        disgust_score = emotions_data['disgust']
+        fear_score = emotions_data['fear']
+        joy_score = emotions_data['joy']
+        sadness_score = emotions_data['sadness']    
+        dominant_emotion = max(emotions_data, key=emotions_data.get)
+    elif response.status_code == 400:
+        pass
+
     return {
         'anger': anger_score,
         'disgust': disgust_score,
